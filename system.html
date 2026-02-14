@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>System</title>
+<style>
+body { background:black; color:#00ff88; font-family:monospace; padding:20px; transition:2s; }
+</style>
+</head>
+<body>
+<h3>system layer active</h3>
+<p id="status"></p>
+
+<script>
+let status = document.getElementById("status");
+let visits = localStorage.getItem("arg_visits");
+
+status.innerText = "behavior profile: building...";
+
+setTimeout(()=>{
+ if(visits > 2){
+   status.innerText = "profile stabilized";
+   document.body.style.background="white";
+   document.body.style.color="black";
+   document.title="instance watching";
+ } else {
+   status.innerText = "insufficient data";
+ }
+},4000);
+
+setTimeout(()=>{
+ if(navigator.vibrate){
+   navigator.vibrate(400);
+ }
+},6000);
+</script>
+</body>
+</html>

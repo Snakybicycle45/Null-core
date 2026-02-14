@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Core</title>
+<style>
+body { background:black; color:#00ff88; font-family:monospace; padding:20px; transition:2s; }
+#terminal { white-space:pre-line; }
+input { background:black; color:#00ff88; border:none; outline:none; font-family:monospace; }
+.glitch { color:red; }
+</style>
+</head>
+<body>
+<div id="terminal"></div>
+<br>
+> <input type="text" id="cmd" autofocus>
+
+<script>
+let term = document.getElementById("terminal");
+let input = document.getElementById("cmd");
+
+let visits = localStorage.getItem("arg_visits");
+if(!visits) visits = 0;
+visits++;
+localStorage.setItem("arg_visits", visits);
+
+term.innerText += "core booting...\n";
+term.innerText += "visit count: " + visits + "\n";
+
+setTimeout(()=>{
+ term.innerText += "type ACCESS\n";
+},2000);
+
+input.addEventListener("keypress",function(e){
+ if(e.key==="Enter"){
+   let value = input.value.toLowerCase();
+   term.innerText += "\n> "+value+"\n";
+   input.value="";
+
+   if(value==="access"){
+     term.innerText += "permission granted\n";
+     setTimeout(()=>{
+       window.location.href="system.html";
+     },2000);
+   } else {
+     term.innerText += "command recorded\n";
+   }
+ }
+});
+</script>
+</body>
+</html>

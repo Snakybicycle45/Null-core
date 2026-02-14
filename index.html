@@ -1,30 +1,20 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>NULL CORE</title>
+
 <style>
 body {
   background: black;
   color: #00ff88;
   font-family: monospace;
   padding: 20px;
+  overflow-x: hidden;
 }
 
 #terminal {
   white-space: pre-wrap;
-}
-
-.cursor {
-  display: inline-block;
-  width: 10px;
-  background: #00ff88;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  50% { background: transparent; }
 }
 
 input {
@@ -33,25 +23,49 @@ input {
   color: #00ff88;
   font-family: monospace;
   outline: none;
-  width: 90%;
+  width: 100%;
+  display: none;
 }
 </style>
 </head>
 
 <body>
-<div id="terminal">
-connection established  
-node status: unstable  
 
-type "enter" to access core  
-
-</div>
-
+<div id="terminal"></div>
 <input id="command" autofocus />
 
 <script>
 const terminal = document.getElementById("terminal");
 const input = document.getElementById("command");
+
+const bootSequence = [
+  "NULL SYSTEM v3.1.7",
+  "Initializing kernel...",
+  "Loading memory modules...",
+  "Memory check: OK",
+  "Establishing secure connection...",
+  "Connection established",
+  "Node status: unstable",
+  "Loading core interface...",
+  "",
+  "Type 'enter' to access core",
+  ""
+];
+
+let i = 0;
+
+function boot() {
+  if (i < bootSequence.length) {
+    terminal.innerHTML += bootSequence[i] + "\n";
+    i++;
+    setTimeout(boot, 600);
+  } else {
+    input.style.display = "block";
+    input.focus();
+  }
+}
+
+boot();
 
 input.addEventListener("keydown", function(e){
   if(e.key === "Enter"){
@@ -59,11 +73,11 @@ input.addEventListener("keydown", function(e){
     terminal.innerHTML += "> " + cmd + "\n";
     
     if(cmd === "enter"){
-      terminal.innerHTML += "access granted...\nloading core...\n";
+      terminal.innerHTML += "Access granted...\nWelcome to NULL CORE\n";
     } else if(cmd === "status"){
-      terminal.innerHTML += "node stability: 42%\n";
+      terminal.innerHTML += "Node stability: 42%\n";
     } else {
-      terminal.innerHTML += "unknown command\n";
+      terminal.innerHTML += "Unknown command\n";
     }
 
     input.value = "";
@@ -71,5 +85,6 @@ input.addEventListener("keydown", function(e){
   }
 });
 </script>
+
 </body>
 </html>

@@ -40,7 +40,7 @@ input {
    CONFIG
 =================================*/
 
-const STORED_HASH_REAL = awaitHash("nullcore"); // hash généré dynamiquement
+let STORED_HASH_REAL = "";
 let loggedIn=false;
 let adminMode=false;
 let username="";
@@ -181,6 +181,9 @@ terminal.innerHTML+="Unknown command\n";
 input.value="";
 window.scrollTo(0,document.body.scrollHeight);
 }
+});
+  awaitHash("motdepasse").then(hash => {
+    STORED_HASH_REAL = hash;
 });
 
 </script>

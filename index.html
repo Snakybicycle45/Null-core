@@ -17,19 +17,14 @@ body {
   white-space: pre-wrap;
 }
 
-input {
+  input {
   background: black;
   border: none;
   color: #00ff88;
   font-family: monospace;
   outline: none;
   width: 100%;
-  #command {
-  font-family: monospace;
-  outline: none;
-  width: 100%;
   }
-}
 </style>
 </head>
 
@@ -39,6 +34,9 @@ input {
 <input id="command" autofocus />
 
 <script>
+  window.onload = function() {
+  document.getElementById("command").focus();
+};
 
 /* ===============================
    CONFIG

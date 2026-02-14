@@ -35,55 +35,156 @@ input {
 <input id="command" autofocus />
 
 <script>
-const terminal = document.getElementById("terminal");
-const input = document.getElementById("command");
+  <script>
 
-const bootSequence = [
-  "NULL SYSTEM v3.1.7",
-  "Initializing kernel...",
-  "Loading memory modules...",
-  "Memory check: OK",
-  "Establishing secure connection...",
-  "Connection established",
-  "Node status: unstable",
-  "Loading core interface...",
-  "",
-  "Type 'enter' to access core",
-  ""
-];
+/* ===============================
+   CONFIG
+=================================*/
 
-let i = 0;
+const STORED_HASH_REAL = awaitHash("nullcore"); // hash généré dynamiquement
+let loggedIn=false;
+let adminMode=false;
+let username="";
+let players=[];
+let fakeIP="";
 
-function boot() {
-  if (i < bootSequence.length) {
-    terminal.innerHTML += bootSequence[i] + "\n";
-    i++;
-    setTimeout(boot, 600);
-  } else {
-    input.style.display = "block";
-    input.focus();
-  }
+/* ===============================
+   HASH
+=================================*/
+
+async function awaitHash(text){
+const msgBuffer=new TextEncoder().encode(text);
+const hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);
+const hashArray=Array.from(new Uint8Array(hashBuffer));
+return hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-boot();
+/* ===============================
+   FAKE IP GENERATOR
+=================================*/
 
-input.addEventListener("keydown", function(e){
-  if(e.key === "Enter"){
-    let cmd = input.value;
-    terminal.innerHTML += "> " + cmd + "\n";
-    
-    if(cmd === "enter"){
-      terminal.innerHTML += "Access granted...\nWelcome to NULL CORE\n";
-    } else if(cmd === "status"){
-      terminal.innerHTML += "Node stability: 42%\n";
-    } else {
-      terminal.innerHTML += "Unknown command\n";
-    }
+function generateFakeIP(){
+return "185."+rand(10,250)+"."+rand(1,250)+"."+rand(1,250);
+}
 
-    input.value = "";
-    window.scrollTo(0, document.body.scrollHeight);
-  }
+function rand(min,max){
+return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+/* ===============================
+   MULTI USER SIMULATION
+=================================*/
+
+function spawnFakePlayers(){
+const names=["ghost_01","proxyNode","darkSignal","cipherX","voidUser"];
+players=[];
+for(let i=0;i<rand(1,4);i++){
+players.push(names[rand(0,names.length-1)]);
+}
+}
+
+function showPlayers(){
+terminal.innerHTML+="\n--- CONNECTED NODES ---\n";
+players.forEach(p=>{
+terminal.innerHTML+=p+" | online\n";
 });
+terminal.innerHTML+="------------------------\n";
+}
+
+/* ===============================
+   ARG GLOBAL EVENTS
+=================================*/
+
+function globalEvent(){
+const events=[
+"Node breach detected in sector 7.",
+"Encrypted transmission intercepted.",
+"Unknown entity joined the network.",
+"Packet corruption anomaly detected.",
+"Signal distortion increasing..."
+];
+terminal.innerHTML+="\n[GLOBAL EVENT] "+events[rand(0,events.length-1)]+"\n";
+}
+
+/* ===============================
+   FAKE TRACE
+=================================*/
+
+function traceUser(){
+terminal.innerHTML+="Tracing connection...\n";
+setTimeout(()=>{
+terminal.innerHTML+="IP detected: "+fakeIP+"\n";
+terminal.innerHTML+="Location: Europe Node Cluster\n";
+},1000);
+setTimeout(()=>{
+terminal.innerHTML+="Proxy chain detected...\n";
+},2000);
+setTimeout(()=>{
+terminal.innerHTML+="Trace lost.\n";
+},3000);
+}
+
+/* ===============================
+   LOGIN FLOW
+=================================*/
+
+terminal.innerHTML="NULL NETWORK v7.0\nType 'login'\n\n";
+input.style.display="block";
+input.focus();
+
+input.addEventListener("keydown",async function(e){
+
+if(e.key==="Enter"){
+let cmd=input.value.trim();
+terminal.innerHTML+="> "+cmd+"\n";
+
+if(cmd==="login"){
+terminal.innerHTML+="Enter username:\n";
+}
+else if(!username){
+username=cmd;
+terminal.innerHTML+="Enter password:\n";
+}
+else if(!loggedIn){
+let hash=await awaitHash(cmd);
+let realHash=await awaitHash("nullcore");
+if(hash===realHash){
+loggedIn=true;
+fakeIP=generateFakeIP();
+spawnFakePlayers();
+terminal.innerHTML+="Authentication successful.\n";
+terminal.innerHTML+="Assigned IP: "+fakeIP+"\n";
+terminal.innerHTML+="Connected to NULL global mesh.\n";
+}else{
+terminal.innerHTML+="Invalid credentials.\n";
+username="";
+}
+}
+else if(cmd==="who"){
+showPlayers();
+}
+else if(cmd==="trace"){
+traceUser();
+}
+else if(cmd==="event"){
+globalEvent();
+}
+else if(cmd==="logout"){
+loggedIn=false;
+username="";
+players=[];
+terminal.innerHTML+="Disconnected from network.\n";
+}
+else{
+terminal.innerHTML+="Unknown command\n";
+}
+
+input.value="";
+window.scrollTo(0,document.body.scrollHeight);
+}
+});
+
+</script>
 </script>
 
 </body>

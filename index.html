@@ -1,16 +1,75 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Entry Node</title>
+<title>NULL CORE</title>
 <style>
-body { background:black; color:#00ff88; font-family:monospace; padding:20px; }
-a { color:#00ff88; text-decoration:none; }
+body {
+  background: black;
+  color: #00ff88;
+  font-family: monospace;
+  padding: 20px;
+}
+
+#terminal {
+  white-space: pre-wrap;
+}
+
+.cursor {
+  display: inline-block;
+  width: 10px;
+  background: #00ff88;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  50% { background: transparent; }
+}
+
+input {
+  background: black;
+  border: none;
+  color: #00ff88;
+  font-family: monospace;
+  outline: none;
+  width: 90%;
+}
 </style>
 </head>
+
 <body>
-<h2>connection established</h2>
-<p>node status: unstable</p>
-<p><a href="core.html">enter core</a></p>
+<div id="terminal">
+connection established  
+node status: unstable  
+
+type "enter" to access core  
+
+</div>
+
+<input id="command" autofocus />
+
+<script>
+const terminal = document.getElementById("terminal");
+const input = document.getElementById("command");
+
+input.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    let cmd = input.value;
+    terminal.innerHTML += "> " + cmd + "\n";
+    
+    if(cmd === "enter"){
+      terminal.innerHTML += "access granted...\nloading core...\n";
+    } else if(cmd === "status"){
+      terminal.innerHTML += "node stability: 42%\n";
+    } else {
+      terminal.innerHTML += "unknown command\n";
+    }
+
+    input.value = "";
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+});
+</script>
 </body>
 </html>

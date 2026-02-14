@@ -133,9 +133,8 @@ terminal.innerHTML="NULL NETWORK v7.0\nType 'login'\n\n";
 input.style.display="block";
 input.focus();
 
-input.addEventListener("keydown",async function(e){
-
-if(e.key==="Enter"){
+input.addEventListener("keyup",async function(e){
+  if(e.key==="Enter" || e.keyCode===13)
 let cmd=input.value.trim();
 terminal.innerHTML+="> "+cmd+"\n";
 

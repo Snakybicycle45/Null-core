@@ -40,7 +40,6 @@ input {
    CONFIG
 =================================*/
 
-let STORED_HASH_REAL = "";
 let loggedIn=false;
 let adminMode=false;
 let username="";
@@ -182,7 +181,7 @@ input.value="";
 window.scrollTo(0,document.body.scrollHeight);
 }
 });
-  awaitHash("motdepasse").then(hash => {
+  awaitHash("nullcore").then(hash => {
     STORED_HASH_REAL = hash;
 });
 

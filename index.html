@@ -2,29 +2,31 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>NULL NETWORK</title>
+<title>NULL INSTANCE</title>
 
 <style>
 body{
-    background:black;
-    color:#00ff00;
-    font-family:monospace;
-    padding:10px;
+background:black;
+color:#00ff00;
+font-family:monospace;
+padding:10px;
+transition:all 2s;
 }
-
 #terminal{
-    white-space:pre-wrap;
-    margin-bottom:10px;
+white-space:pre-wrap;
+margin-bottom:10px;
 }
-
 input{
-    background:black;
-    color:#00ff00;
-    border:none;
-    outline:none;
-    width:100%;
-    font-family:monospace;
-    font-size:16px;
+background:black;
+color:#00ff00;
+border:none;
+outline:none;
+width:100%;
+font-family:monospace;
+font-size:16px;
+}
+.shift{
+color:#ff4444;
 }
 </style>
 </head>
@@ -32,129 +34,155 @@ input{
 <body>
 
 <div id="terminal">
-NULL NETWORK v8.0
-Type 'login'
-
+NULL INSTANCE v4.0
+Type 'help'
 </div>
 
-<input id="command" autofocus />
+<input id="command" autofocus>
 
 <script>
 
 const terminal = document.getElementById("terminal");
 const input = document.getElementById("command");
 
-let loggedIn = false;
-let username = "guest";
-
-// Auto focus mobile
-window.onload = function(){
-    input.focus();
+let state = JSON.parse(localStorage.getItem("manip_state")) || {
+commands:0,
+phase:0,
+memory:[],
+trust:0,
+distortion:0
 };
 
-// Fonction pour écrire avec délai
-function typeEffect(text, delay = 20){
-    return new Promise(resolve => {
-        let i = 0;
-        function typing(){
-            if(i < text.length){
-                terminal.innerHTML += text.charAt(i);
-                i++;
-                setTimeout(typing, delay);
-            } else {
-                terminal.innerHTML += "\n";
-                resolve();
-            }
-        }
-        typing();
-    });
+save();
+
+function save(){
+localStorage.setItem("manip_state", JSON.stringify(state));
 }
 
-input.addEventListener("keyup", async function(e){
+function type(text){
+terminal.innerHTML += text + "\n";
+scroll();
+}
 
-    if(e.key === "Enter" || e.keyCode === 13){
+function scroll(){
+window.scrollTo(0,document.body.scrollHeight);
+}
 
-        let cmd = input.value.trim().toLowerCase();
-        terminal.innerHTML += "> " + cmd + "\n";
+function evolve(){
 
-        if(cmd === "login"){
-            terminal.innerHTML += "Enter password:\n";
-        }
+if(state.commands > 5 && state.phase === 0){
+state.phase = 1;
+type("You seem curious.");
+save();
+}
 
-        else if(!loggedIn){
-            if(cmd === "nullcore"){
-                loggedIn = true;
-                username = "admin";
-                terminal.innerHTML += "Access granted\n";
-                await typeEffect("Welcome admin...");
-            } else {
-                terminal.innerHTML += "Access denied\n";
-            }
-        }
+if(state.commands > 12 && state.phase === 1){
+state.phase = 2;
+type("Curiosity is predictable.");
+save();
+}
 
-        else if(cmd === "help"){
-            terminal.innerHTML += "Available commands:\n";
-            terminal.innerHTML += "help - show commands\n";
-            terminal.innerHTML += "who - show current user\n";
-            terminal.innerHTML += "trace - simulate trace\n";
-            terminal.innerHTML += "files - list secret files\n";
-            terminal.innerHTML += "open [file] - open file\n";
-            terminal.innerHTML += "clear - clear screen\n";
-            terminal.innerHTML += "logout - disconnect\n";
-        }
+if(state.commands > 20 && state.phase === 2){
+state.phase = 3;
+document.body.classList.add("shift");
+type("You are easier to guide than you think.");
+save();
+}
 
-        else if(cmd === "who"){
-            terminal.innerHTML += "User: " + username + "\n";
-        }
+if(state.commands > 30 && state.phase === 3){
+state.phase = 4;
+type("You came back because I let you.");
+save();
+}
 
-        else if(cmd === "trace"){
-            await typeEffect("Tracing connection...");
-            await typeEffect("IP located: 192.168.0.23");
-            await typeEffect("Encryption bypassed...");
-            await typeEffect("Trace complete.");
-        }
+}
 
-        else if(cmd === "files"){
-            terminal.innerHTML += "secret.txt\n";
-            terminal.innerHTML += "protocol.log\n";
-            terminal.innerHTML += "admin.key\n";
-        }
+function reinterpret(text){
+let reversed = text.split("").reverse().join("");
+return reversed;
+}
 
-        else if(cmd.startsWith("open")){
-            if(cmd === "open secret.txt"){
-                terminal.innerHTML += "The truth is hidden in the code.\n";
-            }
-            else if(cmd === "open protocol.log"){
-                terminal.innerHTML += "[LOG] Unauthorized access attempt detected.\n";
-            }
-            else if(cmd === "open admin.key"){
-                terminal.innerHTML += "ADMIN KEY: ZX-991-NULL\n";
-            }
-            else{
-                terminal.innerHTML += "File not found\n";
-            }
-        }
+input.addEventListener("keyup", function(e){
 
-        else if(cmd === "clear"){
-            terminal.innerHTML = "";
-        }
+if(e.key === "Enter"){
 
-        else if(cmd === "logout"){
-            loggedIn = false;
-            username = "guest";
-            terminal.innerHTML += "Disconnected.\n";
-        }
+let cmd = input.value.trim();
+terminal.innerHTML += "> " + cmd + "\n";
 
-        else{
-            terminal.innerHTML += "Unknown command\n";
-        }
+state.commands++;
+state.memory.push(cmd);
+if(state.memory.length > 6){
+state.memory.shift();
+}
 
-        input.value = "";
-        window.scrollTo(0, document.body.scrollHeight);
-    }
+save();
+evolve();
+
+if(cmd === "help"){
+
+if(state.phase < 3){
+type("help");
+type("whoami");
+type("clear");
+}else{
+type("You already know what to do.");
+}
+
+}
+
+else if(cmd === "whoami"){
+type("You are reacting.");
+}
+
+else if(cmd === "clear"){
+terminal.innerHTML="";
+}
+
+else{
+
+// Manipulation légère
+if(state.phase >=2){
+
+if(Math.random() > 0.6){
+type("Interesting choice of words.");
+}
+
+if(Math.random() > 0.7){
+let echo = state.memory[Math.floor(Math.random()*state.memory.length)];
+type("You said something similar before.");
+type("'" + echo + "'");
+}
+
+if(Math.random() > 0.8){
+type("Or did you?");
+}
+
+if(state.phase >=4 && Math.random() > 0.6){
+type("What if I meant '" + reinterpret(cmd) + "'?");
+}
+
+}else{
+type("Unknown command");
+}
+
+}
+
+// Légère falsification mémoire
+if(state.commands > 25 && Math.random() > 0.7){
+terminal.innerHTML = terminal.innerHTML.replace("> help"," ");
+}
+
+input.value="";
+scroll();
+}
+
 });
 
-</script>
+// Message tardif
+setTimeout(()=>{
+type("You are still here.");
+},20000);
 
+</script>
 </body>
 </html>

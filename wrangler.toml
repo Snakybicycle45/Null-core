@@ -1,3 +1,7 @@
 name = "nexus-observatory"
-main = "index.js"
+main = "src/index.js"
 compatibility_date = "2026-02-15"
+
+[[kv_namespaces]]
+binding = "ARG_KV"
+id = "8d8fc1182ebe4008be7eaf9c16350952"

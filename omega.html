@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Omega</title>
+<link rel="stylesheet" href="style.css">
+<script src="progression.js"></script>
+<script src="security.js"></script>
+</head>
+<body>
+
+<script>requireChapter(15);</script>
+
+<h1>OMEGA CORE</h1>
+
+<div id="terminal"></div>
+
+<input type="text" id="ans">
+<button onclick="check()">Enter</button>
+
+<script>
+
+let infiniteLevel = parseInt(localStorage.getItem("infiniteLevel") || "1");
+
+function generatePuzzle(){{
+return infiniteLevel * 7 + getVisits();
+}}
+
+function render(){{
+document.getElementById("terminal").innerHTML =
+"> Infinite Layer " + infiniteLevel + "<br>> Value: " + generatePuzzle();
+}}
+
+function check(){{
+let a=parseInt(document.getElementById("ans").value);
+if(a === generatePuzzle()){{
+infiniteLevel++;
+localStorage.setItem("infiniteLevel", infiniteLevel);
+render();
+}}else{{
+alert("Incorrect.");
+}}
+}}
+
+render();
+
+</script>
+
+</body>
+</html>

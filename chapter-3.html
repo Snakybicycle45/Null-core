@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3</title>
+<link rel="stylesheet" href="style.css">
+<script src="progression.js"></script>
+<script src="security.js"></script>
+</head>
+<body>
+
+<script>requireChapter(3);</script>
+
+<h1>CHAPTER 3</h1>
+
+<div id="terminal"></div>
+
+<input type="text" id="ans">
+<button onclick="check()">Validate</button>
+
+<script>
+
+let visits = getVisits();
+let errors = getErrors();
+let base = 3 * 5;
+
+let puzzle;
+
+if(errors > 3){
+puzzle = base + visits;
+document.body.classList.add("glitch");
+}else if(visits > 10){
+puzzle = base * 2;
+}else{
+puzzle = base;
+}
+
+document.getElementById("terminal").innerHTML =
+"> Adaptive Puzzle: " + puzzle;
+
+function check(){
+let a=document.getElementById("ans").value;
+if(parseInt(a) === puzzle){
+unlockChapter(4);
+window.location.href="chapter-4.html";
+}else{
+addError();
+alert("Incorrect. The system adapts.");
+}
+}
+
+</script>
+
+</body>
+</html>

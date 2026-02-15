@@ -1,283 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>NULL INSTANCE</title>
-
-<style>
-body{
-background:black;
-color:#00ff00;
-font-family:monospace;
-padding:15px;
-transition: background 1s;
-overflow-x:hidden;
-}
-
-#terminal{
-white-space:pre-wrap;
-min-height:300px;
-}
-
-input{
-background:black;
-color:#00ff00;
-border:none;
-outline:none;
-width:100%;
-font-family:monospace;
-font-size:16px;
-}
-
-.cursor{
-display:inline-block;
-width:10px;
-background:#00ff00;
-animation:blink 1s infinite;
-}
-
-@keyframes blink{
-50%{opacity:0;}
-}
-
-.system{ color:#00ff00; }
-.observer{ color:white; font-weight:bold; letter-spacing:2px; }
-.intruder{ color:#ff3333; font-weight:bold; letter-spacing:3px; }
-
-.glitch{
-animation:glitch 0.3s infinite;
-}
-
-@keyframes glitch{
-0%{transform:translate(1px,0);}
-50%{transform:translate(-1px,1px);}
-100%{transform:translate(0,-1px);}
-}
-
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS OBSERVATORY</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div id="terminal"></div>
-<input id="command" autofocus autocomplete="off">
+<header id="logo">
+  NEXUS OBSERVATORY
+</header>
 
-<script>
+<nav>
+  <a href="#">Mission</a>
+  <a href="#">Recherche</a>
+  <a href="#">Accès</a>
+  <a href="#">Contact</a>
+</nav>
 
-const terminal = document.getElementById("terminal");
-const input = document.getElementById("command");
+<section>
+  <h1>Surveillance des anomalies numériques globales</h1>
+  <p>
+    Depuis 2009, nous analysons les signaux faibles du réseau mondial
+    afin d'assurer la stabilité des flux informationnels.
+  </p>
+</section>
 
-let state = JSON.parse(localStorage.getItem("arg_state")) || {
-chapter:1,
-corruption:0,
-finished:false,
-secretUnlocked:false
-};
+<section>
+  <h2>Statut Réseau</h2>
+  <p id="status">Stable</p>
+</section>
 
-let playerName = localStorage.getItem("player_name");
+<footer id="footer">
+  © 2026 NEXUS OBSERVATORY — stability is fragile
+</footer>
 
-function save(){
-localStorage.setItem("arg_state", JSON.stringify(state));
-}
-
-function scroll(){
-window.scrollTo(0,document.body.scrollHeight);
-}
-
-/* ===== MACHINE A ÉCRIRE ===== */
-
-function typeText(text, className="system", speed=30){
-return new Promise(resolve=>{
-let div = document.createElement("div");
-div.className = className;
-terminal.appendChild(div);
-
-let i=0;
-let interval = setInterval(()=>{
-div.textContent += text[i];
-i++;
-scroll();
-if(i>=text.length){
-clearInterval(interval);
-resolve();
-}
-},speed);
-});
-}
-
-/* ===== ENTITÉS ===== */
-
-function systemSpeak(t){ return typeText(t,"system",25); }
-function observerSpeak(t){ return typeText(t.toUpperCase(),"observer",40); }
-function intruderSpeak(t){ return typeText(t.toUpperCase(),"intruder",20); }
-
-/* ===== INTRO LONGUE ===== */
-
-async function intro(){
-await systemSpeak("Booting NULL INSTANCE...");
-await systemSpeak("Memory sectors loading...");
-await systemSpeak("...");
-await systemSpeak("Connection restored.");
-await systemSpeak("Type 'help'");
-}
-
-if(!localStorage.getItem("intro_done")){
-intro();
-localStorage.setItem("intro_done",true);
-}else{
-terminal.innerHTML="NULL INSTANCE RESTORED\nType 'help'\n";
-}
-
-/* ===== COMMANDES ===== */
-
-input.addEventListener("keyup", async function(e){
-
-if(e.key === "Enter"){
-
-let cmd = input.value.trim();
-terminal.innerHTML += "\n> " + cmd + "\n";
-input.value="";
-scroll();
-
-if(state.finished){
-await intruderSpeak("THE SYSTEM IS CLOSED");
-return;
-}
-
-/* ===== CHAPITRE 1 ===== */
-
-if(state.chapter === 1){
-
-if(cmd==="help"){
-await systemSpeak("help");
-await systemSpeak("whoami");
-await systemSpeak("log");
-}
-
-else if(cmd==="whoami"){
-await systemSpeak("Subject ?");
-}
-
-else if(cmd==="log"){
-await systemSpeak("Recovered fragment: A W A K E");
-}
-
-else if(cmd.toUpperCase()==="AWAKE"){
-await systemSpeak("Core reactivated.");
-state.chapter=2;
-save();
-}
-
-}
-
-/* ===== CHAPITRE 2 ===== */
-
-else if(state.chapter===2){
-
-await systemSpeak("Do you feel alone?");
-await systemSpeak("(yes/no)");
-state.chapter=3;
-save();
-
-}
-
-/* ===== CHAPITRE 3 ===== */
-
-else if(state.chapter===3){
-
-await systemSpeak("Response recorded.");
-await systemSpeak("Next trigger phrase detected.");
-await systemSpeak("M I R R O R");
-state.chapter=4;
-save();
-
-}
-
-/* ===== SECRET ===== */
-
-else if(state.chapter===4 && cmd.toUpperCase()==="MIRROR"){
-
-await systemSpeak("Archive opening...");
-await systemSpeak("Warning: corrupted data.");
-state.chapter=5;
-save();
-
-}
-
-/* ===== VOID TRANSITION ===== */
-
-else if(state.chapter===5){
-
-await systemSpeak("...");
-await systemSpeak("Signal unstable.");
-await systemSpeak("Why did you open it?");
-state.chapter=6;
-save();
-
-}
-
-/* ===== VOID ===== */
-
-else if(state.chapter===6){
-
-if(!playerName){
-playerName = prompt("Identify yourself:");
-localStorage.setItem("player_name",playerName);
-await observerSpeak("HELLO "+playerName);
-}
-
-state.corruption++;
-save();
-
-/* glitch progressif */
-if(state.corruption>5){
-terminal.classList.add("glitch");
-}
-
-if(Math.random()<0.3){
-await observerSpeak("YOU ARE NOT LIKE THE OTHERS");
-}
-
-if(Math.random()<state.corruption*0.05){
-await intruderSpeak("STOP TYPING");
-}
-
-/* phases */
-
-if(state.corruption<8){
-
-if(cmd==="whoami"){
-await systemSpeak("You are the breach.");
-await observerSpeak("YOU KNOW YOUR NAME");
-}else{
-await systemSpeak("The void echoes: "+cmd);
-}
-
-}
-
-else if(state.corruption<15){
-
-await intruderSpeak("IT IS TOO LATE");
-await observerSpeak("HE IS LOSING CONTROL");
-
-}
-
-else{
-
-terminal.innerHTML="";
-document.body.style.background="#200000";
-await intruderSpeak("THIS SYSTEM IS MINE");
-await intruderSpeak("YOU BELONG HERE NOW");
-state.finished=true;
-save();
-
-}
-
-}
-
-}
-
-});
-
-</script>
+<script src="script.js"></script>
 </body>
 </html>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>NODE 02</title>
+<meta charset="UTF-8">
+<title>Node 02</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -9,37 +10,31 @@
 <h1>NODE 02</h1>
 
 <p>
-Sequence detected:
+You have passed the first logical verification.
 </p>
 
 <p>
-2 - 3 - 5 - 7 - 11 - ?
+Binary stream detected:
 </p>
 
 <p>
-Internal classification:
-Alpha - Beta - Gamma - Delta - ?
+01001111 01001101 01000101 01000111 01000001
 </p>
 
-<p>
-Final instruction:
-Combine the missing elements.
-</p>
+<input type="text" id="answer" placeholder="Decode and enter">
+<button onclick="next()">Validate</button>
 
-<input type="text" id="answer" placeholder="Enter code">
-<button onclick="check()">Validate</button>
-
-<p id="result"></p>
+<p id="msg"></p>
 
 <script>
 
-function check(){
-let input = document.getElementById("answer").value.toUpperCase();
+function next(){
+let input=document.getElementById("answer").value.toUpperCase();
 
-if(input === "13-EPSILON"){
+if(input==="OMEGA"){
 window.location.href="omega.html";
 }else{
-document.getElementById("result").innerText="ACCESS DENIED";
+document.getElementById("msg").innerText="INVALID";
 }
 }
 

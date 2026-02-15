@@ -76,14 +76,13 @@ input.addEventListener("keyup", async function(e){
         }
 
         else if(!loggedIn){
-            let hash = await awaitHash(cmd);
-            if(hash.startsWith(STORED_HASH_REAL)){
-                loggedIn = true;
-                terminal.innerHTML += "Access granted\n";
-            } else {
-                terminal.innerHTML += "Access denied\n";
-            }
-        }
+    if(cmd === "nullcore"){
+        loggedIn = true;
+        terminal.innerHTML += "Access granted\n";
+    } else {
+        terminal.innerHTML += "Access denied\n";
+    }
+}
 
         else if(cmd === "who"){
             terminal.innerHTML += "User: " + username + "\n";

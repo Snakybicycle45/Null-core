@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ADMIN CONSOLE</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>ADMIN CONSOLE</h1>
+
+<p>
+Restricted internal access.
+</p>
+
+<input type="text" id="cmd" placeholder="Enter command">
+<button onclick="run()">EXECUTE</button>
+
+<p id="output"></p>
+
+<script>
+
+function run(){
+
+let cmd=document.getElementById("cmd").value.toLowerCase();
+
+if(cmd==="status"){
+document.getElementById("output").innerText="System stable.";
+return;
+}
+
+if(cmd==="reveal"){
+document.getElementById("output").innerText="Override code: D2R";
+return;
+}
+
+if(cmd==="omega"){
+document.getElementById("output").innerText="Binary leads to final node.";
+return;
+}
+
+document.getElementById("output").innerText="Unknown command.";
+
+}
+
+</script>
+
+</body>
+</html>

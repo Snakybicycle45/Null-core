@@ -2,44 +2,116 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ADMIN CONSOLE</title>
+<title>ADMIN TERMINAL</title>
 <link rel="stylesheet" href="style.css">
+<style>
+#terminal{
+width:600px;
+margin:0 auto;
+text-align:left;
+background:#000;
+padding:20px;
+border:1px solid #00ff88;
+min-height:300px;
+overflow-y:auto;
+}
+
+#inputLine{
+display:flex;
+margin-top:10px;
+}
+
+#cmd{
+flex:1;
+background:black;
+color:#00ff88;
+border:1px solid #00ff88;
+padding:5px;
+}
+
+button{
+background:black;
+color:#00ff88;
+border:1px solid #00ff88;
+padding:5px;
+cursor:pointer;
+}
+</style>
 </head>
 <body>
 
-<h1>ADMIN CONSOLE</h1>
+<h1>ADMIN TERMINAL</h1>
 
-<p>
-Restricted internal access.
-</p>
+<div id="terminal">
+<p>> Root access granted.</p>
+<p>> Type 'help' for available commands.</p>
+</div>
 
+<div id="inputLine">
 <input type="text" id="cmd" placeholder="Enter command">
 <button onclick="run()">EXECUTE</button>
-
-<p id="output"></p>
+</div>
 
 <script>
 
+let puzzleSolved = false;
+
+function print(text){
+let terminal = document.getElementById("terminal");
+terminal.innerHTML += "<p>> " + text + "</p>";
+terminal.scrollTop = terminal.scrollHeight;
+}
+
 function run(){
 
-let cmd=document.getElementById("cmd").value.toLowerCase();
+let input = document.getElementById("cmd").value.toLowerCase();
+document.getElementById("cmd").value="";
 
-if(cmd==="status"){
-document.getElementById("output").innerText="System stable.";
+if(input === "help"){
+print("Available commands:");
+print("status");
+print("scan");
+print("cipher");
+print("unlock");
 return;
 }
 
-if(cmd==="reveal"){
-document.getElementById("output").innerText="Override code: D2R";
+if(input === "status"){
+print("System stable.");
 return;
 }
 
-if(cmd==="omega"){
-document.getElementById("output").innerText="Binary leads to final node.";
+if(input === "scan"){
+print("Scanning network...");
+print("Encrypted string detected:");
+print("BQQMF");
 return;
 }
 
-document.getElementById("output").innerText="Unknown command.";
+if(input === "cipher"){
+print("Hint: Shift each letter backward by 1.");
+return;
+}
+
+if(input === "apple"){
+puzzleSolved = true;
+print("Decryption accepted.");
+return;
+}
+
+if(input === "unlock"){
+if(puzzleSolved){
+print("Accessing final node...");
+setTimeout(function(){
+window.location.href="omega.html";
+},1500);
+}else{
+print("Authorization failed. Solve encryption first.");
+}
+return;
+}
+
+print("Unknown command.");
 
 }
 

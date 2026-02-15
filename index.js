@@ -1,7 +1,11 @@
 export default {
   async fetch(request) {
-    return new Response("Nexus Observatory ARG Online", {
-      headers: { "content-type": "text/plain" }
-    });
+    const url = new URL(request.url);
+
+    if (url.pathname === "/api/test") {
+      return new Response("API OK");
+    }
+
+    return new Response("Nexus Observatory ARG Online");
   }
 }

@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SECURE ACCESS</title>
+<title>NEXUS SECURE NODE</title>
 
 <style>
 body{
@@ -10,14 +10,16 @@ background:black;
 color:#00ff00;
 font-family:monospace;
 text-align:center;
-padding-top:100px;
+padding-top:80px;
+transition:0.3s;
+overflow:hidden;
 }
 
 #box{
 border:1px solid #00ff00;
 display:inline-block;
 padding:30px;
-width:300px;
+width:340px;
 }
 
 input{
@@ -26,7 +28,7 @@ color:#00ff00;
 border:1px solid #00ff00;
 padding:5px;
 margin-top:10px;
-width:80%;
+width:85%;
 }
 
 button{
@@ -38,19 +40,16 @@ margin-top:10px;
 cursor:pointer;
 }
 
-.red{
-color:red;
-}
-
+.red{color:red;}
 .glitch{
-animation: glitch 0.2s infinite;
+animation: glitch 0.15s infinite;
 }
 
 @keyframes glitch{
-0%{transform:translate(1px,-1px);}
-25%{transform:translate(-1px,1px);}
-50%{transform:translate(1px,1px);}
-75%{transform:translate(-1px,-1px);}
+0%{transform:translate(2px,-2px);}
+25%{transform:translate(-2px,2px);}
+50%{transform:translate(2px,2px);}
+75%{transform:translate(-2px,-2px);}
 100%{transform:translate(0,0);}
 }
 </style>
@@ -59,52 +58,131 @@ animation: glitch 0.2s infinite;
 <body>
 
 <div id="box">
-<h2>SECURE NODE ACCESS</h2>
+<h2>SECURE ACCESS PROTOCOL</h2>
 
-<p id="scan">Initialisation...</p>
+<p id="status">Initializing secure node...</p>
 
-<input type="password" id="code" placeholder="Authorization Code">
+<input type="password" id="code" placeholder="Authorization Key">
 <br>
 <button onclick="check()">ENTER</button>
 
 <p id="message"></p>
-
 </div>
 
 <script>
 
-/* Faux scan IP */
+let intrusion = 0;
+let level = 1;
+let interrupted = false;
 
-setTimeout(()=>{ 
-document.getElementById("scan").innerText="Scanning connection...";
-},1000);
-
-setTimeout(()=>{
-document.getElementById("scan").innerText="IP detected: 192.168."+Math.floor(Math.random()*255)+"."+Math.floor(Math.random()*255);
-},2500);
+/* Phase 1 – Scan normal */
 
 setTimeout(()=>{
-document.getElementById("scan").innerText+="\nChecking clearance level...";
+document.getElementById("status").innerText="Scanning connection...";
+},1500);
+
+setTimeout(()=>{
+document.getElementById("status").innerText=
+"IP detected: 172."+rand()+"."+rand()+"."+rand();
+},3000);
+
+setTimeout(()=>{
+document.getElementById("status").innerText=
+"Clearance Level Required: 3";
+},4500);
+
+/* Entité qui interrompt */
+
+setTimeout(()=>{
+interrupt();
+},8000);
+
+function rand(){
+return Math.floor(Math.random()*255);
+}
+
+/* ENTITÉ */
+
+function interrupt(){
+interrupted = true;
+document.body.classList.add("glitch");
+
+document.getElementById("status").innerText=
+"UNAUTHORIZED OBSERVER DETECTED.";
+
+setTimeout(()=>{
+document.getElementById("status").innerText=
+"I SEE YOU.";
+},2000);
+
+setTimeout(()=>{
+document.body.classList.remove("glitch");
+document.getElementById("status").innerText=
+"System integrity compromised.";
 },4000);
+}
 
-/* Vérification code */
+/* Vérification multi-niveaux */
 
 function check(){
 let input=document.getElementById("code").value;
 let msg=document.getElementById("message");
 
-if(input==="NEXUS-47"){
-msg.innerText="Access Granted.";
+if(level===1 && input==="NEXUS-47"){
+msg.innerText="Level 1 Authorized.";
+level=2;
+document.getElementById("code").value="";
+document.getElementById("code").placeholder="Level 2 Key";
+return;
+}
+
+if(level===2 && input==="PROTOCOL-3"){
+msg.innerText="Level 2 Authorized.";
+level=3;
+document.getElementById("code").value="";
+document.getElementById("code").placeholder="Final Clearance";
+return;
+}
+
+if(level===3 && input==="NULL"){
+msg.innerText="Final Authorization Granted.";
 document.body.classList.add("glitch");
 
 setTimeout(()=>{
 window.location.href="null.html";
-},2000);
+},2500);
+return;
+}
 
-}else{
+/* Mauvais code */
+
+intrusion++;
 msg.innerText="Access Denied.";
 msg.className="red";
+
+if(intrusion>=3){
+corrupt();
 }
+}
+
+/* Corruption progressive */
+
+function corrupt(){
+document.body.style.background="darkred";
+document.body.classList.add("glitch");
+
+document.getElementById("status").innerText=
+"INTRUSION LEVEL CRITICAL.";
+
+setTimeout(()=>{
+document.getElementById("status").innerText=
+"TRACE INITIATED.";
+},2000);
+
+setTimeout(()=>{
+document.getElementById("status").innerText=
+"YOU SHOULD NOT BE HERE.";
+},4000);
 }
 
 </script>

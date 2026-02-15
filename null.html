@@ -1,14 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>NULL</title>
+<title>NODE 02</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body style="background:black;color:red;text-align:center;padding-top:120px;">
+<body>
 
-<h1>WELCOME TO NULL</h1>
-<p>The system no longer controls this node.</p>
+<h1>NODE 02</h1>
+
+<p>
+Sequence detected:
+</p>
+
+<p>
+2 - 3 - 5 - 7 - 11 - ?
+</p>
+
+<p>
+Internal classification:
+Alpha - Beta - Gamma - Delta - ?
+</p>
+
+<p>
+Final instruction:
+Combine the missing elements.
+</p>
+
+<input type="text" id="answer" placeholder="Enter code">
+<button onclick="check()">Validate</button>
+
+<p id="result"></p>
+
+<script>
+
+function check(){
+let input = document.getElementById("answer").value.toUpperCase();
+
+if(input === "13-EPSILON"){
+window.location.href="omega.html";
+}else{
+document.getElementById("result").innerText="ACCESS DENIED";
+}
+}
+
+</script>
 
 </body>
 </html>

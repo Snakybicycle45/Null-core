@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 18</title>
+<link rel="stylesheet" href="style.css">
+<script src="progression.js"></script>
+<script src="security.js"></script>
+</head>
+<body>
+
+<script>requireChapter(18);</script>
+
+<h1>CHAPTER 18</h1>
+
+<div id="terminal">
+<p>> System Layer 18 Active</p>
+<p>> Visits detected: <span id="visits"></span></p>
+<p>> Decode: 18 × 13</p>
+</div>
+
+<input type="text" id="ans" placeholder="Enter result">
+<button onclick="check()">Validate</button>
+
+<script>
+document.getElementById("visits").innerText = getVisits();
+
+function check(){
+let a=document.getElementById("ans").value;
+if(a == "234"){
+unlockChapter(19);
+window.location.href="chapter-19.html";
+}else{
+alert("Incorrect.");
+}
+}
+</script>
+
+</body>
+</html>

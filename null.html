@@ -2,63 +2,15 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>NULL INSTANCE</title>
-
-<style>
-body{
-background:black;
-color:#00ff00;
-font-family:monospace;
-padding:15px;
-}
-
-#terminal{
-white-space:pre-wrap;
-min-height:300px;
-}
-
-input{
-background:black;
-color:#00ff00;
-border:none;
-outline:none;
-width:100%;
-font-family:monospace;
-}
-</style>
+<title>NULL</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body style="background:black;color:red;text-align:center;padding-top:120px;">
 
-<div id="terminal">
-NULL INSTANCE RESTORED
-Type 'help'
-</div>
+<h1>WELCOME TO NULL</h1>
 
-<input id="command" autofocus autocomplete="off">
-
-<script>
-const terminal = document.getElementById("terminal");
-const input = document.getElementById("command");
-
-input.addEventListener("keydown", function(e){
-  if(e.key === "Enter"){
-    const cmd = input.value;
-    terminal.innerHTML += "\n> " + cmd;
-    input.value = "";
-
-    if(cmd === "help"){
-      terminal.innerHTML += "\nCommands: whoami, log";
-    }
-    else if(cmd === "whoami"){
-      terminal.innerHTML += "\nIdentity unresolved.";
-    }
-    else if(cmd === "log"){
-      terminal.innerHTML += "\nRecovered fragment: AWAKE";
-    }
-  }
-});
-</script>
+<p>The system no longer controls this node.</p>
 
 </body>
 </html>

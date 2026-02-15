@@ -9,7 +9,6 @@
 .glitch{
 animation: glitch 0.15s infinite;
 }
-
 @keyframes glitch{
 0%{transform:translate(2px,-2px);}
 25%{transform:translate(-2px,2px);}
@@ -18,11 +17,13 @@ animation: glitch 0.15s infinite;
 100%{transform:translate(0,0);}
 }
 </style>
-
 </head>
+
 <body>
 
+<header>
 <h1>SECURITY NODE</h1>
+</header>
 
 <p id="status">Initializing secure scan...</p>
 
@@ -33,10 +34,9 @@ animation: glitch 0.15s infinite;
 
 <script>
 
-let level = 1;
-let intrusion = 0;
+let level=1;
+let intrusion=0;
 
-/* Faux scan */
 setTimeout(()=>{
 document.getElementById("status").innerText =
 "IP DETECTED: 172."+rand()+"."+rand()+"."+rand();
@@ -47,59 +47,52 @@ document.getElementById("status").innerText =
 "CLEARANCE LEVEL 3 REQUIRED";
 },4000);
 
-/* Entité */
 setTimeout(()=>{
 document.getElementById("status").innerText =
 "UNAUTHORIZED OBSERVER DETECTED.";
 document.body.classList.add("glitch");
-
 setTimeout(()=>{
 document.body.classList.remove("glitch");
 },2000);
-
 },7000);
 
 function rand(){
 return Math.floor(Math.random()*255);
 }
 
-/* Vérification des codes */
-
 function check(){
 
-let input = document.getElementById("code").value;
-let message = document.getElementById("message");
+let input=document.getElementById("code").value;
+let msg=document.getElementById("message");
 
-if(level === 1 && input === "NEXUS-47"){
-message.innerText = "LEVEL 1 AUTHORIZED";
-level = 2;
+if(level===1 && input==="NEXUS-47"){
+msg.innerText="LEVEL 1 AUTHORIZED";
+level=2;
 document.getElementById("code").value="";
 return;
 }
 
-if(level === 2 && input === "PROTOCOL-3"){
-message.innerText = "LEVEL 2 AUTHORIZED";
-level = 3;
+if(level===2 && input==="PROTOCOL-3"){
+msg.innerText="LEVEL 2 AUTHORIZED";
+level=3;
 document.getElementById("code").value="";
 return;
 }
 
-if(level === 3 && input === "NULL"){
-message.innerText = "ACCESS GRANTED";
+if(level===3 && input==="NULL"){
+msg.innerText="ACCESS GRANTED";
 setTimeout(()=>{
 window.location.href="null.html";
 },2000);
 return;
 }
 
-/* Mauvais code */
 intrusion++;
-message.innerText = "ACCESS DENIED";
+msg.innerText="ACCESS DENIED";
 
-if(intrusion >= 3){
+if(intrusion>=3){
 document.body.style.background="darkred";
-document.getElementById("status").innerText =
-"INTRUSION LEVEL CRITICAL";
+document.getElementById("status").innerText="INTRUSION LEVEL CRITICAL";
 document.body.classList.add("glitch");
 }
 

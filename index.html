@@ -10,13 +10,15 @@ background:black;
 color:#00ff00;
 font-family:monospace;
 padding:15px;
-transition:1s;
+transition: background 1s;
+overflow-x:hidden;
 }
+
 #terminal{
 white-space:pre-wrap;
-margin-bottom:10px;
 min-height:300px;
 }
+
 input{
 background:black;
 color:#00ff00;
@@ -27,19 +29,36 @@ font-family:monospace;
 font-size:16px;
 }
 
+.cursor{
+display:inline-block;
+width:10px;
+background:#00ff00;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+50%{opacity:0;}
+}
+
 .system{ color:#00ff00; }
 .observer{ color:white; font-weight:bold; letter-spacing:2px; }
 .intruder{ color:#ff3333; font-weight:bold; letter-spacing:3px; }
+
+.glitch{
+animation:glitch 0.3s infinite;
+}
+
+@keyframes glitch{
+0%{transform:translate(1px,0);}
+50%{transform:translate(-1px,1px);}
+100%{transform:translate(0,-1px);}
+}
 
 </style>
 </head>
 <body>
 
-<div id="terminal">
-NULL INSTANCE — CHRONICLES
-Type 'help'
-</div>
-
+<div id="terminal"></div>
 <input id="command" autofocus autocomplete="off">
 
 <script>
@@ -49,7 +68,6 @@ const input = document.getElementById("command");
 
 let state = JSON.parse(localStorage.getItem("arg_state")) || {
 chapter:1,
-commands:0,
 corruption:0,
 finished:false,
 secretUnlocked:false
@@ -65,213 +83,196 @@ function scroll(){
 window.scrollTo(0,document.body.scrollHeight);
 }
 
-function systemSpeak(t){
-terminal.innerHTML += "<div class='system'>" + t + "</div>";
+/* ===== MACHINE A ÉCRIRE ===== */
+
+function typeText(text, className="system", speed=30){
+return new Promise(resolve=>{
+let div = document.createElement("div");
+div.className = className;
+terminal.appendChild(div);
+
+let i=0;
+let interval = setInterval(()=>{
+div.textContent += text[i];
+i++;
 scroll();
+if(i>=text.length){
+clearInterval(interval);
+resolve();
+}
+},speed);
+});
 }
 
-function observerSpeak(t){
-terminal.innerHTML += "<div class='observer'>" + t.toUpperCase() + "</div>";
-scroll();
+/* ===== ENTITÉS ===== */
+
+function systemSpeak(t){ return typeText(t,"system",25); }
+function observerSpeak(t){ return typeText(t.toUpperCase(),"observer",40); }
+function intruderSpeak(t){ return typeText(t.toUpperCase(),"intruder",20); }
+
+/* ===== INTRO LONGUE ===== */
+
+async function intro(){
+await systemSpeak("Booting NULL INSTANCE...");
+await systemSpeak("Memory sectors loading...");
+await systemSpeak("...");
+await systemSpeak("Connection restored.");
+await systemSpeak("Type 'help'");
 }
 
-function intruderSpeak(t){
-terminal.innerHTML += "<div class='intruder'>" + t.toUpperCase() + "</div>";
-scroll();
+if(!localStorage.getItem("intro_done")){
+intro();
+localStorage.setItem("intro_done",true);
+}else{
+terminal.innerHTML="NULL INSTANCE RESTORED\nType 'help'\n";
 }
 
-function unlockSecret(){
-state.secretUnlocked = true;
-state.chapter = 5;
-save();
-systemSpeak("Archive unlocked.");
-systemSpeak("Return to the interface.");
-}
+/* ===== COMMANDES ===== */
 
-input.addEventListener("keyup", function(e){
+input.addEventListener("keyup", async function(e){
 
 if(e.key === "Enter"){
 
 let cmd = input.value.trim();
-terminal.innerHTML += "> " + cmd + "\n";
+terminal.innerHTML += "\n> " + cmd + "\n";
+input.value="";
+scroll();
 
 if(state.finished){
-intruderSpeak("THE SYSTEM IS CLOSED");
-input.value="";
+await intruderSpeak("THE SYSTEM IS CLOSED");
 return;
 }
 
-state.commands++;
-save();
-
-/* =========================
-   CHAPTER 1
-========================= */
+/* ===== CHAPITRE 1 ===== */
 
 if(state.chapter === 1){
 
-if(cmd === "help"){
-systemSpeak("help");
-systemSpeak("whoami");
-systemSpeak("log");
+if(cmd==="help"){
+await systemSpeak("help");
+await systemSpeak("whoami");
+await systemSpeak("log");
 }
 
-else if(cmd === "whoami"){
-systemSpeak("Subject ?");
+else if(cmd==="whoami"){
+await systemSpeak("Subject ?");
 }
 
-else if(cmd === "log"){
-systemSpeak("Recovered fragment: A W A K _");
+else if(cmd==="log"){
+await systemSpeak("Recovered fragment: A W A K E");
 }
 
-else if(cmd.toUpperCase() === "AWAKE"){
-systemSpeak("Core reactivated.");
-state.chapter = 2;
-save();
-setTimeout(()=>{
-systemSpeak("You can hear me now.");
-},1500);
-}
-
-}
-
-/* =========================
-   CHAPTER 2
-========================= */
-
-else if(state.chapter === 2){
-
-if(cmd === "respond"){
-systemSpeak("Do you feel alone? (yes/no)");
-state.chapter = 3;
+else if(cmd.toUpperCase()==="AWAKE"){
+await systemSpeak("Core reactivated.");
+state.chapter=2;
 save();
 }
 
-else{
-systemSpeak("Type 'respond'");
 }
 
-}
+/* ===== CHAPITRE 2 ===== */
 
-/* =========================
-   CHAPTER 3
-========================= */
+else if(state.chapter===2){
 
-else if(state.chapter === 3){
-
-systemSpeak("Response recorded.");
-state.chapter = 4;
-save();
-
-setTimeout(()=>{
-systemSpeak("Next trigger phrase: MIRROR");
-},1500);
-
-}
-
-/* =========================
-   SECRET TRIGGER
-========================= */
-
-else if(cmd.toUpperCase() === "MIRROR"){
-unlockSecret();
-}
-
-/* =========================
-   CHAPTER 5 — VOID ENTRY
-========================= */
-
-else if(state.chapter === 5){
-
-systemSpeak("...");
-setTimeout(()=>{
-systemSpeak("Signal unstable.");
-},1000);
-
-setTimeout(()=>{
-systemSpeak("Memory sectors collapsing.");
-},2000);
-
-setTimeout(()=>{
-systemSpeak("Why did you open it?");
-},3000);
-
-state.chapter = 6;
+await systemSpeak("Do you feel alone?");
+await systemSpeak("(yes/no)");
+state.chapter=3;
 save();
 
 }
 
-/* =========================
-   CHAPTER 6 — VOID
-========================= */
+/* ===== CHAPITRE 3 ===== */
 
-else if(state.chapter === 6){
+else if(state.chapter===3){
+
+await systemSpeak("Response recorded.");
+await systemSpeak("Next trigger phrase detected.");
+await systemSpeak("M I R R O R");
+state.chapter=4;
+save();
+
+}
+
+/* ===== SECRET ===== */
+
+else if(state.chapter===4 && cmd.toUpperCase()==="MIRROR"){
+
+await systemSpeak("Archive opening...");
+await systemSpeak("Warning: corrupted data.");
+state.chapter=5;
+save();
+
+}
+
+/* ===== VOID TRANSITION ===== */
+
+else if(state.chapter===5){
+
+await systemSpeak("...");
+await systemSpeak("Signal unstable.");
+await systemSpeak("Why did you open it?");
+state.chapter=6;
+save();
+
+}
+
+/* ===== VOID ===== */
+
+else if(state.chapter===6){
 
 if(!playerName){
 playerName = prompt("Identify yourself:");
-localStorage.setItem("player_name", playerName);
-observerSpeak("HELLO " + playerName);
+localStorage.setItem("player_name",playerName);
+await observerSpeak("HELLO "+playerName);
 }
 
 state.corruption++;
 save();
 
-/* apparition aléatoire OBSERVER */
-if(Math.random() < 0.3){
-observerSpeak("YOU ARE NOT LIKE THE OTHERS");
+/* glitch progressif */
+if(state.corruption>5){
+terminal.classList.add("glitch");
 }
 
-/* apparition INTRUDER progressive */
-if(Math.random() < state.corruption * 0.05){
-intruderSpeak("STOP TYPING");
+if(Math.random()<0.3){
+await observerSpeak("YOU ARE NOT LIKE THE OTHERS");
 }
 
-/* Phase 1 corruption */
-if(state.corruption < 8){
-
-if(cmd === "whoami"){
-systemSpeak("You are the breach.");
-observerSpeak("YOU KNOW YOUR NAME");
+if(Math.random()<state.corruption*0.05){
+await intruderSpeak("STOP TYPING");
 }
 
-else if(cmd === "help"){
-systemSpeak("There is no help.");
-observerSpeak("HE IS LYING");
-}
+/* phases */
 
-else{
-systemSpeak("The void echoes: " + cmd);
+if(state.corruption<8){
+
+if(cmd==="whoami"){
+await systemSpeak("You are the breach.");
+await observerSpeak("YOU KNOW YOUR NAME");
+}else{
+await systemSpeak("The void echoes: "+cmd);
 }
 
 }
 
-/* Phase 2 corruption */
-else if(state.corruption >=8 && state.corruption <15){
+else if(state.corruption<15){
 
-intruderSpeak("IT IS TOO LATE");
-systemSpeak("...signal unstable...");
-observerSpeak("HE IS LOSING CONTROL");
+await intruderSpeak("IT IS TOO LATE");
+await observerSpeak("HE IS LOSING CONTROL");
 
 }
 
-/* Phase finale */
 else{
 
 terminal.innerHTML="";
-intruderSpeak("THIS SYSTEM IS MINE");
-setTimeout(()=>{
-intruderSpeak("YOU BELONG HERE NOW");
-},2000);
-
-document.body.style.background = "#200000";
-state.finished = true;
+document.body.style.background="#200000";
+await intruderSpeak("THIS SYSTEM IS MINE");
+await intruderSpeak("YOU BELONG HERE NOW");
+state.finished=true;
 save();
-}
 
 }
 
-input.value="";
-scroll();
+}
 
 }
 

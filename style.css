@@ -1,10 +1,37 @@
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
 body{
-background:#0a0a0a;
+background:radial-gradient(circle at top, #111 0%, #000 60%);
 color:#00ff88;
 font-family:monospace;
 text-align:center;
-padding:40px;
-margin:0;
+padding:30px 15px;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+animation:fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
+}
+
+h1{
+margin-bottom:15px;
+letter-spacing:2px;
+animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+from{text-shadow:0 0 5px #00ff88;}
+to{text-shadow:0 0 15px #00ff88;}
 }
 
 nav{
@@ -13,20 +40,73 @@ margin:20px 0;
 
 nav a{
 color:#00ff88;
-margin:0 15px;
+margin:0 12px;
 text-decoration:none;
+transition:0.3s;
+}
+
+nav a:hover{
+color:white;
+text-shadow:0 0 10px #00ff88;
 }
 
 input, button{
 background:black;
 color:#00ff88;
 border:1px solid #00ff88;
-padding:6px;
-margin:5px;
-cursor:pointer;
+padding:8px 12px;
+margin:6px;
+font-family:monospace;
+transition:0.3s;
 }
 
-.subtitle{
-color:#777;
-font-size:14px;
+button:hover{
+background:#00ff88;
+color:black;
+}
+
+#terminal{
+width:100%;
+max-width:750px;
+background:#000;
+border:1px solid #00ff88;
+padding:20px;
+margin:20px auto;
+min-height:300px;
+text-align:left;
+overflow-y:auto;
+border-radius:8px;
+box-shadow:0 0 20px rgba(0,255,136,0.2);
+animation:terminalGlow 3s infinite alternate;
+}
+
+@keyframes terminalGlow{
+from{box-shadow:0 0 10px rgba(0,255,136,0.2);}
+to{box-shadow:0 0 25px rgba(0,255,136,0.4);}
+}
+
+.cursor{
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%,50%,100%{opacity:1;}
+25%,75%{opacity:0;}
+}
+
+@media(max-width:600px){
+
+h1{
+font-size:20px;
+}
+
+#terminal{
+padding:15px;
+min-height:250px;
+}
+
+input{
+width:90%;
+}
+
 }

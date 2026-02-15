@@ -1,4 +1,5 @@
 import { generatePuzzle, validateAnswer } from "./engine.js";
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -65,16 +66,4 @@ async function handleAnswer(request, env) {
   }), {
     headers: { "Content-Type": "application/json" }
   });
-}
-
-function generatePuzzle(seed, chapter) {
-  let value = (seed + chapter) % 100;
-  return {
-    prompt: `Decode: ${btoa("NEXUS" + value)}`
-  };
-}
-
-function validateAnswer(seed, chapter, answer) {
-  let value = (seed + chapter) % 100;
-  return answer.toLowerCase() === ("nexus" + value);
 }

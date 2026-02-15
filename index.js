@@ -14,56 +14,116 @@ export default {
   }
 };
 
-/* ===================== */
-/*     STATE HANDLER     */
-/* ===================== */
+/* ========================= */
+/*       USER SYSTEM         */
+/* ========================= */
+
+async function getUserId(request) {
+  const cookie = request.headers.get("Cookie");
+
+  if (cookie && cookie.includes("nexus_id=")) {
+    return cookie.split("nexus_id=")[1];
+  }
+
+  return crypto.randomUUID();
+}
+
+/* ========================= */
+/*       GET STATE           */
+/* ========================= */
 
 async function getState(request, env) {
-  const userId = "player"; // version simple pour test
+  const userId = await getUserId(request);
 
   let progress = await env.ARG_KV.get(userId);
 
   if (!progress) {
-    progress = JSON.stringify({ chapter: 1 });
+    progress = JSON.stringify({
+      chapter: 1,
+      errors: 0,
+      infinite: 0
+    });
     await env.ARG_KV.put(userId, progress);
   }
 
   const data = JSON.parse(progress);
-
-  const question = `Chapter ${data.chapter} → ${data.chapter} x 2 ?`;
+  const puzzle = generatePuzzle(data);
 
   return json({
     chapter: data.chapter,
-    question: question
-  });
+    infinite: data.infinite,
+    question: puzzle.question
+  }, userId);
 }
 
-/* ===================== */
-/*    ANSWER HANDLER     */
-/* ===================== */
+/* ========================= */
+/*      HANDLE ANSWER        */
+/* ========================= */
 
 async function handleAnswer(request, env) {
-  const userId = "player";
+  const userId = await getUserId(request);
   const body = await request.json();
 
   let progress = await env.ARG_KV.get(userId);
   const data = JSON.parse(progress);
 
-  const correctAnswer = data.chapter * 2;
+  const puzzle = generatePuzzle(data);
 
-  if (parseInt(body.answer) === correctAnswer) {
-    data.chapter++;
+  if (parseInt(body.answer) === puzzle.answer) {
+
+    if (data.chapter < 20) {
+      data.chapter++;
+    } else {
+      data.infinite++;
+    }
+
+    data.errors = 0;
+
     await env.ARG_KV.put(userId, JSON.stringify(data));
-    return json({ success: true });
+    return json({ success: true }, userId);
   }
 
-  return json({ success: false });
+  data.errors++;
+  await env.ARG_KV.put(userId, JSON.stringify(data));
+
+  return json({ success: false }, userId);
 }
 
-/* ===================== */
+/* ========================= */
+/*     ADAPTIVE PUZZLES      */
+/* ========================= */
 
-function json(data) {
+function generatePuzzle(data) {
+
+  // Mode massif après chapitre 20
+  if (data.chapter >= 20) {
+    const base = (data.infinite + 1) * 7 + data.errors;
+    return {
+      question: `Infinite Layer ${data.infinite + 1} → ${base} + ${data.chapter}`,
+      answer: base + data.chapter
+    };
+  }
+
+  // IA adaptative
+  let base = data.chapter * 3;
+
+  if (data.errors >= 2) {
+    base = Math.max(2, base - 2); // plus facile si erreurs
+  }
+
+  return {
+    question: `Chapter ${data.chapter} → ${base} x ${data.chapter}`,
+    answer: base * data.chapter
+  };
+}
+
+/* ========================= */
+
+function json(data, userId) {
   return new Response(JSON.stringify(data), {
-    headers: { "content-type": "application/json" }
+    headers: {
+      "content-type": "application/json",
+      "Set-Cookie": `nexus_id=${userId}; Path=/; HttpOnly`
+    }
   });
 }

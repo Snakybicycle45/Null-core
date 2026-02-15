@@ -2,189 +2,104 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>NULL CORE</title>
+<title>NULL NETWORK</title>
 
 <style>
-body {
-  background: black;
-  color: #00ff88;
-  font-family: monospace;
-  padding: 20px;
-  overflow-x: hidden;
+body{
+    background:black;
+    color:#00ff00;
+    font-family:monospace;
+    padding:10px;
 }
 
-#terminal {
-  white-space: pre-wrap;
+#terminal{
+    white-space:pre-wrap;
+    margin-bottom:10px;
 }
 
-  input {
-  background: black;
-  border: none;
-  color: #00ff88;
-  font-family: monospace;
-  outline: none;
-  width: 100%;
-  }
+input{
+    background:black;
+    color:#00ff00;
+    border:none;
+    outline:none;
+    width:100%;
+    font-family:monospace;
+    font-size:16px;
+}
 </style>
 </head>
 
 <body>
 
-<div id="terminal"></div>
+<div id="terminal">
+NULL NETWORK v7.0
+Type 'login'
+
+</div>
+
 <input id="command" autofocus />
 
 <script>
-  window.onload = function() {
-  document.getElementById("command").focus();
+
+const terminal = document.getElementById("terminal");
+const input = document.getElementById("command");
+
+const STORED_HASH_REAL = "b96e3714c3"; // ton hash ici
+
+let loggedIn = false;
+let adminMode = false;
+let username = "";
+
+// Focus automatique
+window.onload = function(){
+    input.focus();
 };
 
-/* ===============================
-   CONFIG
-=================================*/
-
-  const STORED_HASH_REAL = "b96e3714c63296ef507eb95f6af6fce5542c8c18019e3acd5f92c5689e52c30f";
-let loggedIn=false;
-let adminMode=false;
-let username="";
-let players=[];
-let fakeIP="";
-
-/* ===============================
-   HASH
-=================================*/
-
+// Fonction hash
 async function awaitHash(text){
-const msgBuffer=new TextEncoder().encode(text);
-const hashBuffer=await crypto.subtle.digest('SHA-256',msgBuffer);
-const hashArray=Array.from(new Uint8Array(hashBuffer));
-return hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
+    const msgBuffer = new TextEncoder().encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-/* ===============================
-   FAKE IP GENERATOR
-=================================*/
+// 🔥 CORRECTION MOBILE ICI
+input.addEventListener("keyup", async function(e){
 
-function generateFakeIP(){
-return "185."+rand(10,250)+"."+rand(1,250)+"."+rand(1,250);
-}
+    if(e.key === "Enter" || e.keyCode === 13){
 
-function rand(min,max){
-return Math.floor(Math.random()*(max-min+1))+min;
-}
+        let cmd = input.value.trim();
+        terminal.innerHTML += "> " + cmd + "\n";
 
-/* ===============================
-   MULTI USER SIMULATION
-=================================*/
+        if(cmd === "login"){
+            terminal.innerHTML += "Enter password:\n";
+        }
 
-function spawnFakePlayers(){
-const names=["ghost_01","proxyNode","darkSignal","cipherX","voidUser"];
-players=[];
-for(let i=0;i<rand(1,4);i++){
-players.push(names[rand(0,names.length-1)]);
-}
-}
+        else if(!loggedIn){
+            let hash = await awaitHash(cmd);
+            if(hash.startsWith(STORED_HASH_REAL)){
+                loggedIn = true;
+                terminal.innerHTML += "Access granted\n";
+            } else {
+                terminal.innerHTML += "Access denied\n";
+            }
+        }
 
-function showPlayers(){
-terminal.innerHTML+="\n--- CONNECTED NODES ---\n";
-players.forEach(p=>{
-terminal.innerHTML+=p+" | online\n";
-});
-terminal.innerHTML+="------------------------\n";
-}
+        else if(cmd === "who"){
+            terminal.innerHTML += "User: " + username + "\n";
+        }
 
-/* ===============================
-   ARG GLOBAL EVENTS
-=================================*/
+        else if(cmd === "clear"){
+            terminal.innerHTML = "";
+        }
 
-function globalEvent(){
-const events=[
-"Node breach detected in sector 7.",
-"Encrypted transmission intercepted.",
-"Unknown entity joined the network.",
-"Packet corruption anomaly detected.",
-"Signal distortion increasing..."
-];
-terminal.innerHTML+="\n[GLOBAL EVENT] "+events[rand(0,events.length-1)]+"\n";
-}
+        else{
+            terminal.innerHTML += "Unknown command\n";
+        }
 
-/* ===============================
-   FAKE TRACE
-=================================*/
-
-function traceUser(){
-terminal.innerHTML+="Tracing connection...\n";
-setTimeout(()=>{
-terminal.innerHTML+="IP detected: "+fakeIP+"\n";
-terminal.innerHTML+="Location: Europe Node Cluster\n";
-},1000);
-setTimeout(()=>{
-terminal.innerHTML+="Proxy chain detected...\n";
-},2000);
-setTimeout(()=>{
-terminal.innerHTML+="Trace lost.\n";
-},3000);
-}
-
-/* ===============================
-   LOGIN FLOW
-=================================*/
-
-terminal.innerHTML="NULL NETWORK v7.0\nType 'login'\n\n";
-input.style.display="block";
-input.focus();
-
-input.addEventListener("keyup",async function(e){
-  if(e.key==="Enter" || e.keyCode===13)
-let cmd=input.value.trim();
-terminal.innerHTML+="> "+cmd+"\n";
-
-if(cmd==="login"){
-terminal.innerHTML+="Enter username:\n";
-}
-else if(!username){
-username=cmd;
-terminal.innerHTML+="Enter password:\n";
-}
-else if(!loggedIn){
-let hash=await awaitHash(cmd);
-let realHash=await awaitHash("nullcore");
-if(hash===realHash){
-loggedIn=true;
-fakeIP=generateFakeIP();
-spawnFakePlayers();
-terminal.innerHTML+="Authentication successful.\n";
-terminal.innerHTML+="Assigned IP: "+fakeIP+"\n";
-terminal.innerHTML+="Connected to NULL global mesh.\n";
-}else{
-terminal.innerHTML+="Invalid credentials.\n";
-username="";
-}
-}
-else if(cmd==="who"){
-showPlayers();
-}
-else if(cmd==="trace"){
-traceUser();
-}
-else if(cmd==="event"){
-globalEvent();
-}
-else if(cmd==="logout"){
-loggedIn=false;
-username="";
-players=[];
-terminal.innerHTML+="Disconnected from network.\n";
-}
-else{
-terminal.innerHTML+="Unknown command\n";
-}
-
-input.value="";
-window.scrollTo(0,document.body.scrollHeight);
-}
-});
-  awaitHash("nullcore").then(hash => {
-    STORED_HASH_REAL = hash;
+        input.value = "";
+        window.scrollTo(0, document.body.scrollHeight);
+    }
 });
 
 </script>

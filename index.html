@@ -9,12 +9,13 @@ body{
 background:black;
 color:#00ff00;
 font-family:monospace;
-padding:10px;
-transition:all 2s;
+padding:15px;
+transition:1s;
 }
 #terminal{
 white-space:pre-wrap;
 margin-bottom:10px;
+min-height:300px;
 }
 input{
 background:black;
@@ -25,81 +26,66 @@ width:100%;
 font-family:monospace;
 font-size:16px;
 }
-.shift{
-color:#ff4444;
-}
+
+.system{ color:#00ff00; }
+.observer{ color:white; font-weight:bold; letter-spacing:2px; }
+.intruder{ color:#ff3333; font-weight:bold; letter-spacing:3px; }
+
 </style>
 </head>
-
 <body>
 
 <div id="terminal">
-NULL INSTANCE v4.0
+NULL INSTANCE — CHRONICLES
 Type 'help'
 </div>
 
-<input id="command" autofocus>
+<input id="command" autofocus autocomplete="off">
 
 <script>
 
 const terminal = document.getElementById("terminal");
 const input = document.getElementById("command");
 
-let state = JSON.parse(localStorage.getItem("manip_state")) || {
+let state = JSON.parse(localStorage.getItem("arg_state")) || {
+chapter:1,
 commands:0,
-phase:0,
-memory:[],
-trust:0,
-distortion:0
+corruption:0,
+finished:false,
+secretUnlocked:false
 };
 
-save();
+let playerName = localStorage.getItem("player_name");
 
 function save(){
-localStorage.setItem("manip_state", JSON.stringify(state));
-}
-
-function type(text){
-terminal.innerHTML += text + "\n";
-scroll();
+localStorage.setItem("arg_state", JSON.stringify(state));
 }
 
 function scroll(){
 window.scrollTo(0,document.body.scrollHeight);
 }
 
-function evolve(){
+function systemSpeak(t){
+terminal.innerHTML += "<div class='system'>" + t + "</div>";
+scroll();
+}
 
-if(state.commands > 5 && state.phase === 0){
-state.phase = 1;
-type("You seem curious.");
+function observerSpeak(t){
+terminal.innerHTML += "<div class='observer'>" + t.toUpperCase() + "</div>";
+scroll();
+}
+
+function intruderSpeak(t){
+terminal.innerHTML += "<div class='intruder'>" + t.toUpperCase() + "</div>";
+scroll();
+}
+
+function unlockSecret(){
+state.secretUnlocked = true;
+state.chapter = 5;
 save();
-}
-
-if(state.commands > 12 && state.phase === 1){
-state.phase = 2;
-type("Curiosity is predictable.");
-save();
-}
-
-if(state.commands > 20 && state.phase === 2){
-state.phase = 3;
-document.body.classList.add("shift");
-type("You are easier to guide than you think.");
-save();
-}
-
-if(state.commands > 30 && state.phase === 3){
-state.phase = 4;
-type("You came back because I let you.");
-save();
-}
-
-}
-
-function reinterpret(text){
-let reversed = text.split("").reverse().join("");
-return reversed;
+systemSpeak("Archive unlocked.");
+systemSpeak("Return to the interface.");
 }
 
 input.addEventListener("keyup", function(e){
@@ -109,79 +95,187 @@ if(e.key === "Enter"){
 let cmd = input.value.trim();
 terminal.innerHTML += "> " + cmd + "\n";
 
-state.commands++;
-state.memory.push(cmd);
-if(state.memory.length > 6){
-state.memory.shift();
+if(state.finished){
+intruderSpeak("THE SYSTEM IS CLOSED");
+input.value="";
+return;
 }
 
+state.commands++;
 save();
-evolve();
+
+/* =========================
+   CHAPTER 1
+========================= */
+
+if(state.chapter === 1){
 
 if(cmd === "help"){
-
-if(state.phase < 3){
-type("help");
-type("whoami");
-type("clear");
-}else{
-type("You already know what to do.");
-}
-
+systemSpeak("help");
+systemSpeak("whoami");
+systemSpeak("log");
 }
 
 else if(cmd === "whoami"){
-type("You are reacting.");
+systemSpeak("Subject ?");
 }
 
-else if(cmd === "clear"){
-terminal.innerHTML="";
+else if(cmd === "log"){
+systemSpeak("Recovered fragment: A W A K _");
+}
+
+else if(cmd.toUpperCase() === "AWAKE"){
+systemSpeak("Core reactivated.");
+state.chapter = 2;
+save();
+setTimeout(()=>{
+systemSpeak("You can hear me now.");
+},1500);
+}
+
+}
+
+/* =========================
+   CHAPTER 2
+========================= */
+
+else if(state.chapter === 2){
+
+if(cmd === "respond"){
+systemSpeak("Do you feel alone? (yes/no)");
+state.chapter = 3;
+save();
 }
 
 else{
-
-// Manipulation légère
-if(state.phase >=2){
-
-if(Math.random() > 0.6){
-type("Interesting choice of words.");
-}
-
-if(Math.random() > 0.7){
-let echo = state.memory[Math.floor(Math.random()*state.memory.length)];
-type("You said something similar before.");
-type("'" + echo + "'");
-}
-
-if(Math.random() > 0.8){
-type("Or did you?");
-}
-
-if(state.phase >=4 && Math.random() > 0.6){
-type("What if I meant '" + reinterpret(cmd) + "'?");
-}
-
-}else{
-type("Unknown command");
+systemSpeak("Type 'respond'");
 }
 
 }
 
-// Légère falsification mémoire
-if(state.commands > 25 && Math.random() > 0.7){
-terminal.innerHTML = terminal.innerHTML.replace("> help"," ");
+/* =========================
+   CHAPTER 3
+========================= */
+
+else if(state.chapter === 3){
+
+systemSpeak("Response recorded.");
+state.chapter = 4;
+save();
+
+setTimeout(()=>{
+systemSpeak("Next trigger phrase: MIRROR");
+},1500);
+
+}
+
+/* =========================
+   SECRET TRIGGER
+========================= */
+
+else if(cmd.toUpperCase() === "MIRROR"){
+unlockSecret();
+}
+
+/* =========================
+   CHAPTER 5 — VOID ENTRY
+========================= */
+
+else if(state.chapter === 5){
+
+systemSpeak("...");
+setTimeout(()=>{
+systemSpeak("Signal unstable.");
+},1000);
+
+setTimeout(()=>{
+systemSpeak("Memory sectors collapsing.");
+},2000);
+
+setTimeout(()=>{
+systemSpeak("Why did you open it?");
+},3000);
+
+state.chapter = 6;
+save();
+
+}
+
+/* =========================
+   CHAPTER 6 — VOID
+========================= */
+
+else if(state.chapter === 6){
+
+if(!playerName){
+playerName = prompt("Identify yourself:");
+localStorage.setItem("player_name", playerName);
+observerSpeak("HELLO " + playerName);
+}
+
+state.corruption++;
+save();
+
+/* apparition aléatoire OBSERVER */
+if(Math.random() < 0.3){
+observerSpeak("YOU ARE NOT LIKE THE OTHERS");
+}
+
+/* apparition INTRUDER progressive */
+if(Math.random() < state.corruption * 0.05){
+intruderSpeak("STOP TYPING");
+}
+
+/* Phase 1 corruption */
+if(state.corruption < 8){
+
+if(cmd === "whoami"){
+systemSpeak("You are the breach.");
+observerSpeak("YOU KNOW YOUR NAME");
+}
+
+else if(cmd === "help"){
+systemSpeak("There is no help.");
+observerSpeak("HE IS LYING");
+}
+
+else{
+systemSpeak("The void echoes: " + cmd);
+}
+
+}
+
+/* Phase 2 corruption */
+else if(state.corruption >=8 && state.corruption <15){
+
+intruderSpeak("IT IS TOO LATE");
+systemSpeak("...signal unstable...");
+observerSpeak("HE IS LOSING CONTROL");
+
+}
+
+/* Phase finale */
+else{
+
+terminal.innerHTML="";
+intruderSpeak("THIS SYSTEM IS MINE");
+setTimeout(()=>{
+intruderSpeak("YOU BELONG HERE NOW");
+},2000);
+
+document.body.style.background = "#200000";
+state.finished = true;
+save();
+}
+
 }
 
 input.value="";
 scroll();
+
 }
 
 });
-
-// Message tardif
-setTimeout(()=>{
-type("You are still here.");
-},20000);
 
 </script>
 </body>

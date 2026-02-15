@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nexus Observatory</title>
+</head>
+<body>
+  <h1>Nexus Observatory</h1>
+  <div id="chapter"></div>
+  <div id="question"></div>
+  <input id="answer" />
+  <button onclick="submitAnswer()">Submit</button>
+
+<script>
+async function load() {
+  let res = await fetch("/api/state");
+  let data = await res.json();
+  document.getElementById("chapter").innerText = "Chapter " + data.chapter;
+  document.getElementById("question").innerText = data.question;
+}
+
+async function submitAnswer() {
+  let answer = document.getElementById("answer").value;
+  let res = await fetch("/api/answer", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({answer})
+  });
+  let data = await res.json();
+  load();
+}
+
+load();
+</script>
+</body>
+</html>

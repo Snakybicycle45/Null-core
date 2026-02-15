@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ARCHIVE NODE</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>ARCHIVE NODE 7</h1>
+
+<p>
+Encrypted fragment recovered.
+</p>
+
+<p>
+VJKU KU PQV VJG GPF
+</p>
+
+<p>
+Hint: Caesar shift -2
+</p>
+
+<input type="text" id="key" placeholder="Enter decoded message">
+<button onclick="check()">Validate</button>
+
+<p id="msg"></p>
+
+<script>
+
+function check(){
+let input=document.getElementById("key").value.toUpperCase();
+
+if(input==="THIS IS NOT THE END"){
+window.location.href="deep-terminal.html";
+}else{
+document.getElementById("msg").innerText="INVALID";
+}
+}
+
+</script>
+
+</body>
+</html>

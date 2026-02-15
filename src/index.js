@@ -3,127 +3,77 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/state") {
-      return getState(request, env);
+      return handleState(request, env);
     }
 
-    if (url.pathname === "/api/answer" && request.method === "POST") {
+    if (url.pathname === "/api/answer") {
       return handleAnswer(request, env);
     }
 
-    return new Response("Nexus Observatory ARG Online");
+    return new Response("Not found", { status: 404 });
   }
 };
 
-/* ========================= */
-/*       USER SYSTEM         */
-/* ========================= */
+async function getPlayer(request, env) {
+  let cookie = request.headers.get("Cookie");
+  let id = cookie?.match(/player=([^;]+)/)?.[1];
 
-async function getUserId(request) {
-  const cookie = request.headers.get("Cookie");
-
-  if (cookie && cookie.includes("nexus_id=")) {
-    return cookie.split("nexus_id=")[1];
+  if (!id) {
+    id = crypto.randomUUID();
   }
 
-  return crypto.randomUUID();
+  let data = await env.ARG_KV.get(`player:${id}`);
+  let player = data ? JSON.parse(data) : {
+    chapter: 1,
+    seed: Math.floor(Math.random() * 1000000)
+  };
+
+  return { id, player };
 }
 
-/* ========================= */
-/*       GET STATE           */
-/* ========================= */
+async function handleState(request, env) {
+  let { id, player } = await getPlayer(request, env);
 
-async function getState(request, env) {
-  const userId = await getUserId(request);
+  let puzzle = generatePuzzle(player.seed, player.chapter);
 
-  let progress = await env.ARG_KV.get(userId);
-
-  if (!progress) {
-    progress = JSON.stringify({
-      chapter: 1,
-      errors: 0,
-      infinite: 0
-    });
-    await env.ARG_KV.put(userId, progress);
-  }
-
-  const data = JSON.parse(progress);
-  const puzzle = generatePuzzle(data);
-
-  return json({
-    chapter: data.chapter,
-    infinite: data.infinite,
-    question: puzzle.question
-  }, userId);
+  return new Response(JSON.stringify({
+    chapter: player.chapter,
+    question: puzzle.prompt
+  }), {
+    headers: {
+      "Content-Type": "application/json",
+      "Set-Cookie": `player=${id}; Path=/; HttpOnly`
+    }
+  });
 }
-
-/* ========================= */
-/*      HANDLE ANSWER        */
-/* ========================= */
 
 async function handleAnswer(request, env) {
-  const userId = await getUserId(request);
-  const body = await request.json();
+  let { id, player } = await getPlayer(request, env);
+  let body = await request.json();
 
-  let progress = await env.ARG_KV.get(userId);
-  const data = JSON.parse(progress);
+  let correct = validateAnswer(player.seed, player.chapter, body.answer);
 
-  const puzzle = generatePuzzle(data);
-
-  if (parseInt(body.answer) === puzzle.answer) {
-
-    if (data.chapter < 20) {
-      data.chapter++;
-    } else {
-      data.infinite++;
-    }
-
-    data.errors = 0;
-
-    await env.ARG_KV.put(userId, JSON.stringify(data));
-    return json({ success: true }, userId);
+  if (correct) {
+    player.chapter++;
+    await env.ARG_KV.put(`player:${id}`, JSON.stringify(player));
   }
 
-  data.errors++;
-  await env.ARG_KV.put(userId, JSON.stringify(data));
-
-  return json({ success: false }, userId);
+  return new Response(JSON.stringify({
+    correct,
+    chapter: player.chapter
+  }), {
+    headers: { "Content-Type": "application/json" }
+  });
 }
 
-/* ========================= */
-/*     ADAPTIVE PUZZLES      */
-/* ========================= */
-
-function generatePuzzle(data) {
-
-  // Mode massif après chapitre 20
-  if (data.chapter >= 20) {
-    const base = (data.infinite + 1) * 7 + data.errors;
-    return {
-      question: `Infinite Layer ${data.infinite + 1} → ${base} + ${data.chapter}`,
-      answer: base + data.chapter
-    };
-  }
-
-  // IA adaptative
-  let base = data.chapter * 3;
-
-  if (data.errors >= 2) {
-    base = Math.max(2, base - 2); // plus facile si erreurs
-  }
-
+function generatePuzzle(seed, chapter) {
+  let value = (seed + chapter) % 100;
   return {
-    question: `Chapter ${data.chapter} → ${base} x ${data.chapter}`,
-    answer: base * data.chapter
+    prompt: `Decode: ${btoa("NEXUS" + value)}`
   };
 }
 
-/* ========================= */
-
-function json(data, userId) {
-  return new Response(JSON.stringify(data), {
-    headers: {
-      "content-type": "application/json",
-      "Set-Cookie": `nexus_id=${userId}; Path=/; HttpOnly`
-    }
-  });
+function validateAnswer(seed, chapter, answer) {
+  let value = (seed + chapter) % 100;
+  return answer.toLowerCase() === ("nexus" + value);
 }
